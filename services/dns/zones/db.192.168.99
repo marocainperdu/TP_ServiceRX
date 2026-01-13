@@ -1,0 +1,18 @@
+; Reverse Zone 192.168.99.0/24
+$TTL 300
+@   IN  SOA dns.smartcampus.local. admin.smartcampus.local. (
+            2024011301  ; Serial
+            3600        ; Refresh
+            1800        ; Retry
+            604800      ; Expire
+            300 )       ; Minimum
+
+    IN  NS  dns.smartcampus.local.
+
+20  IN  PTR dns.smartcampus.local.
+10  IN  PTR ipxe.smartcampus.local.
+30  IN  PTR portal.smartcampus.local.
+40  IN  PTR proxy.smartcampus.local.
+50  IN  PTR ftp.smartcampus.local.
+60  IN  PTR db.smartcampus.local.
+1   IN  PTR gw-admin.smartcampus.local.

@@ -1,0 +1,37 @@
+; Zone smartcampus.local - Enregistrements directs
+$TTL 300
+@   IN  SOA dns.smartcampus.local. admin.smartcampus.local. (
+            2024011301  ; Serial
+            3600        ; Refresh
+            1800        ; Retry
+            604800      ; Expire
+            300 )       ; Minimum
+
+    IN  NS  dns.smartcampus.local.
+
+; Infrastructure Services
+dns.smartcampus.local.          IN  A   192.168.99.20
+dhcp.smartcampus.local.         IN  A   192.168.99.10
+ipxe.smartcampus.local.         IN  A   192.168.99.10
+
+; Web Services
+portal.smartcampus.local.       IN  A   192.168.99.30
+admin.smartcampus.local.        IN  A   192.168.99.30
+api.smartcampus.local.          IN  A   192.168.99.30
+www.smartcampus.local.          IN  CNAME portal.smartcampus.local.
+
+; Proxy & Filtering
+proxy.smartcampus.local.        IN  A   192.168.99.40
+
+; Storage Services
+ftp.smartcampus.local.          IN  A   192.168.99.50
+files.smartcampus.local.        IN  CNAME ftp.smartcampus.local.
+
+; Database
+db.smartcampus.local.           IN  A   192.168.99.60
+mysql.smartcampus.local.        IN  CNAME db.smartcampus.local.
+
+; VLAN Gateways
+gw-admin.smartcampus.local.     IN  A   192.168.99.1
+gw-student.smartcampus.local.   IN  A   192.168.100.1
+gw-lab.smartcampus.local.       IN  A   192.168.101.1

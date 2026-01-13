@@ -1,0 +1,29 @@
+#!ipxe
+# Script de démarrage pour Administrateurs
+# Boot Ubuntu Server avec options administrateur
+
+echo [*] SmartCampus - Admin Boot Script
+echo [*] Network initialization...
+
+set image-server http://192.168.99.10:8080
+set kernel-path /images/ubuntu-22.04-server
+set timeout 15
+
+ifopen net0
+dhcp
+
+echo [*] Admin mode - Full feature boot...
+echo [*] Fetching Ubuntu kernel...
+
+kernel ${image-server}${kernel-path}/vmlinuz-5.15.0 console=ttyS0 ro root=/dev/nfs nfsroot=192.168.99.10:/nfsroot/ubuntu-server ip=dhcp
+
+echo [*] Fetching initrd...
+initrd ${image-server}${kernel-path}/initrd.img-5.15.0
+
+echo [*] Booting Ubuntu Server...
+boot
+
+:failed
+echo [!] Boot sequence failed
+sleep 3
+chain http://192.168.99.10:8080/menu.ipxe

@@ -1,0 +1,43 @@
+#!ipxe
+# Menu d'accueil iPXE SmartCampus
+# Permet de choisir le type de boot/install
+
+:start
+menu SmartCampus Boot Menu
+item --gap -- ===== BOOT OPTIONS =====
+item student-linux   Student - Debian GNU/Linux (Labs)
+item admin-linux     Admin - Ubuntu Server
+item pxelinux        Legacy PXELinux
+item --gap -- ===== TOOLS =====
+item shell           iPXE Shell
+item reboot          Reboot System
+item exit            Exit to BIOS
+choose --timeout 10000 --default student-linux target && goto ${target}
+
+:student-linux
+echo Booting Debian GNU/Linux for Students...
+kernel http://192.168.99.10:8080/kernel.ipxe
+boot
+goto start
+
+:admin-linux
+echo Booting Ubuntu Server for Admins...
+kernel http://192.168.99.10:8080/ubuntu-kernel.ipxe
+boot
+goto start
+
+:pxelinux
+echo Booting PXELinux...
+chain http://192.168.99.10:8080/pxelinux.0
+goto start
+
+:shell
+echo Type 'exit' to return to menu
+shell
+goto start
+
+:reboot
+reboot
+
+:exit
+exit

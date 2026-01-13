@@ -1,0 +1,12 @@
+# Domaines autorisés pour les invités (whitelist)
+google.com
+*.google.com
+wikipedia.org
+*.wikipedia.org
+github.com
+*.github.com
+stackexchange.com
+*.stackexchange.com
+debian.org
+ubuntu.com
+university-example.edu

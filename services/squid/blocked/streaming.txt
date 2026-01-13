@@ -1,0 +1,9 @@
+# Services de streaming et P2P bloqués
+.m3u8
+.mp4
+.mkv
+torrent
+*.torrent
+transmission
+utorrent
+qbittorrent

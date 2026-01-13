@@ -1,0 +1,6 @@
+# Services P2P bloqués
+bittorrent
+ipfs
+kad
+dht
+pex

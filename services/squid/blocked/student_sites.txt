@@ -1,0 +1,14 @@
+# Listes de domaines bloquées pour les étudiants
+# Format: .domaine.com
+youtube.com
+*.youtube.com
+facebook.com
+*.facebook.com
+instagram.com
+*.instagram.com
+tiktok.com
+*.tiktok.com
+twitch.tv
+*.twitch.tv
+netflix.com
+*.netflix.com
