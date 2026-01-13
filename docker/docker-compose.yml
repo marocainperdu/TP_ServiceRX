@@ -14,7 +14,7 @@ services:
       MYSQL_USER: smartcampus_user
       MYSQL_PASSWORD: secure_password_123
     volumes:
-      - ./services/database/schema.sql:/docker-entrypoint-initdb.d/init.sql
+      - ../services/database/schema.sql:/docker-entrypoint-initdb.d/init.sql
       - mysql_data:/var/lib/mysql
     networks:
       smartcampus_net:
@@ -24,123 +24,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  # Bind9 DNS Server
-  dns:
-    image: internetsystemsconsortium/bind9:9.18
-    container_name: smartcampus-dns
-    hostname: dns.smartcampus.local
-    ports:
-      - "53:53/udp"
-      - "53:53/tcp"
-    volumes:
-      - ./services/dns/named.conf:/etc/bind/named.conf:ro
-      - ./services/dns/zones:/etc/bind/zones:ro
-      - named_data:/var/lib/bind
-    networks:
-      smartcampus_net:
-        ipv4_address: 192.168.99.20
-    depends_on:
-      - mysql
-
-  # Kea DHCP Server
-  dhcp:
-    image: kea:latest
-    container_name: smartcampus-dhcp
-    hostname: dhcp.smartcampus.local
-    ports:
-      - "67:67/udp"
-      - "68:68/udp"
-    volumes:
-      - ./services/dhcp/kea-dhcp4.conf:/etc/kea/kea-dhcp4.conf:ro
-    networks:
-      smartcampus_net:
-        ipv4_address: 192.168.99.10
-    depends_on:
-      - dns
-
-  # iPXE Boot Server
-  ipxe:
-    image: nginx:alpine
-    container_name: smartcampus-ipxe
-    hostname: ipxe.smartcampus.local
-    ports:
-      - "69:69/udp"
-      - "8080:8080"
-    volumes:
-      - ./services/ipxe/scripts:/usr/share/nginx/html:ro
-    networks:
-      smartcampus_net:
-        ipv4_address: 192.168.99.10
-    depends_on:
-      - dns
-
-  # Squid Proxy
-  proxy:
-    image: sameersbn/squid:3.5.27
-    container_name: smartcampus-proxy
-    hostname: proxy.smartcampus.local
-    ports:
-      - "3128:3128"
-    volumes:
-      - ./services/squid/squid.conf:/etc/squid/squid.conf:ro
-      - ./services/squid/blocked:/etc/squid/blocked:ro
-      - ./services/squid/groups:/etc/squid/groups:ro
-      - squid_cache:/var/spool/squid
-    networks:
-      smartcampus_net:
-        ipv4_address: 192.168.99.40
-    depends_on:
-      - mysql
-
-  # Nginx Reverse Proxy
-  nginx:
-    image: nginx:alpine
-    container_name: smartcampus-nginx
-    hostname: portal.smartcampus.local
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./services/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./webapp:/var/www/webapp:ro
-    networks:
-      smartcampus_net:
-        ipv4_address: 192.168.99.30
-    depends_on:
-      - webapp
-      - mysql
-
-  # Web Application (PHP-FPM)
-  webapp:
-    image: php:8.2-fpm-alpine
-    container_name: smartcampus-webapp
-    volumes:
-      - ./webapp:/var/www/webapp
-    networks:
-      smartcampus_net:
-        ipv4_address: 127.0.0.1
-    depends_on:
-      - mysql
-
-  # vsftpd FTP Server
-  ftp:
-    image: fauria/vsftpd
-    container_name: smartcampus-ftp
-    hostname: ftp.smartcampus.local
-    ports:
-      - "21:21"
-      - "10000-10100:10000-10100"
-    volumes:
-      - ./services/ftp/vsftpd.conf:/etc/vsftpd/vsftpd.conf:ro
-      - ftp_data:/ftp
-    networks:
-      smartcampus_net:
-        ipv4_address: 192.168.99.50
-    environment:
-      PASV_ADDRESS: 192.168.99.50
-    depends_on:
-      - mysql
 
 volumes:
   mysql_data:
