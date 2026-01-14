@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Portal - Plateforme Éducative</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 2rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        .container {
+            flex: 1;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .service-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+        
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .service-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .service-description {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .service-url {
+            color: #667eea;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            display: block;
+            font-weight: 500;
+        }
+        
+        .info-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .info-item {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-value {
+            color: #333;
+            font-family: monospace;
+        }
+        
+        footer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            color: #666;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🏫 Campus Portal</h1>
+        <p class="subtitle">Plateforme de services éducatifs et pédagogiques</p>
+    </header>
+
+    <div class="container">
+        <div class="services-grid">
+            <a href="http://pxe.campus.local" class="service-card">
+                <div class="service-icon">🖥️</div>
+                <h2 class="service-title">Boot PXE</h2>
+                <p class="service-description">
+                    Installation réseau d'OS pour les TP. Démarrez votre ordinateur en réseau pour installer Ubuntu, Debian, ou autres distributions.
+                </p>
+                <span class="service-url">→ pxe.campus.local</span>
+            </a>
+
+            <a href="ftp://ftp.campus.local" class="service-card">
+                <div class="service-icon">📁</div>
+                <h2 class="service-title">Serveur FTP</h2>
+                <p class="service-description">
+                    Téléchargement de ressources lourdes : ISO, logiciels, documents de cours, vidéos pédagogiques.
+                </p>
+                <span class="service-url">→ ftp.campus.local</span>
+            </a>
+
+            <div class="service-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="service-icon">🌐</div>
+                <h2 class="service-title" style="color: white;">Proxy Cache</h2>
+                <p class="service-description" style="color: rgba(255,255,255,0.9);">
+                    Navigation web optimisée et cache des téléchargements. Configurez votre proxy sur le port 3128 pour accélérer votre connexion.
+                </p>
+                <span class="service-url" style="color: white;">→ 172.20.0.30:3128</span>
+            </div>
+
+            <div class="service-card" style="background: #2c3e50; color: white;">
+                <div class="service-icon">🗄️</div>
+                <h2 class="service-title" style="color: white;">Base de données</h2>
+                <p class="service-description" style="color: rgba(255,255,255,0.9);">
+                    MariaDB pour le stockage des données, gestion des utilisateurs et métadonnées des fichiers.
+                </p>
+                <span class="service-url" style="color: white;">→ MariaDB 10.11</span>
+            </div>
+
+            <div class="service-card" style="background: #16a085; color: white;">
+                <div class="service-icon">📡</div>
+                <h2 class="service-title" style="color: white;">DNS & DHCP</h2>
+                <p class="service-description" style="color: rgba(255,255,255,0.9);">
+                    Résolution automatique des noms de domaine et attribution d'adresses IP pour tous les appareils du campus.
+                </p>
+                <span class="service-url" style="color: white;">→ Bind9 + Kea</span>
+            </div>
+
+            <div class="service-card" style="background: #e67e22; color: white;">
+                <div class="service-icon">🔀</div>
+                <h2 class="service-title" style="color: white;">Reverse Proxy</h2>
+                <p class="service-description" style="color: rgba(255,255,255,0.9);">
+                    Nginx comme point d'entrée unique vers tous les services web du campus.
+                </p>
+                <span class="service-url" style="color: white;">→ Nginx</span>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2 style="color: #333; margin-bottom: 1rem;">ℹ️ Informations de connexion</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">RÉSEAU</div>
+                    <div class="info-value">172.20.0.0/16</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">DNS</div>
+                    <div class="info-value">172.20.0.10</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">PASSERELLE</div>
+                    <div class="info-value">172.20.0.1</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">PROXY HTTP</div>
+                    <div class="info-value">172.20.0.30:3128</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem; padding: 1rem; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                <strong>📌 Identifiants par défaut :</strong><br>
+                <span style="color: #666; font-size: 0.9rem;">
+                    FTP → <strong>campus</strong> / <strong>campus123</strong><br>
+                    Base de données → <strong>campus_user</strong> / <strong>campus_pass</strong>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Campus Platform © 2026 | Plateforme éducative open-source</p>
+        <p style="font-size: 0.8rem; margin-top: 0.5rem;">
+            Propulsé par Docker, Nginx, Bind9, Kea DHCP, Squid, MariaDB, vsftpd et iPXE
+        </p>
+    </footer>
+</body>
+</html>

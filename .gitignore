@@ -1,0 +1,29 @@
+# Données persistantes
+data/
+
+# Logs
+logs/
+*.log
+
+# Sauvegardes
+backups/
+
+# Environnement
+.env
+
+# Certificats SSL
+configs/nginx/ssl/
+
+# Fichiers temporaires
+*.tmp
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*

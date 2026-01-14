@@ -1,0 +1,56 @@
+#!ipxe
+
+# Menu de boot PXE pour Campus Platform
+# Ce fichier définit le menu d'installation réseau
+
+:start
+menu Bienvenue sur Campus Platform - Boot PXE
+item --gap -- ============================================
+item --gap -- Sélectionnez un système à installer :
+item --gap -- ============================================
+item ubuntu2204 Ubuntu 22.04 LTS Desktop
+item ubuntu2204-server Ubuntu 22.04 LTS Server
+item debian12 Debian 12 (Bookworm)
+item rescue Mode Rescue / Live USB
+item --gap -- ============================================
+item local Démarrer depuis le disque local
+item reboot Redémarrer l'ordinateur
+choose --default local --timeout 30000 target && goto ${target}
+
+:ubuntu2204
+echo Chargement d'Ubuntu 22.04 Desktop...
+kernel http://archive.ubuntu.com/ubuntu/dists/jammy/main/installer-amd64/current/legacy-images/netboot/ubuntu-installer/amd64/linux
+initrd http://archive.ubuntu.com/ubuntu/dists/jammy/main/installer-amd64/current/legacy-images/netboot/ubuntu-installer/amd64/initrd.gz
+imgargs linux auto=true url=http://pxe.campus.local/preseed/ubuntu-desktop.cfg
+boot || goto failed
+
+:ubuntu2204-server
+echo Chargement d'Ubuntu 22.04 Server...
+kernel http://archive.ubuntu.com/ubuntu/dists/jammy/main/installer-amd64/current/legacy-images/netboot/ubuntu-installer/amd64/linux
+initrd http://archive.ubuntu.com/ubuntu/dists/jammy/main/installer-amd64/current/legacy-images/netboot/ubuntu-installer/amd64/initrd.gz
+imgargs linux auto=true url=http://pxe.campus.local/preseed/ubuntu-server.cfg
+boot || goto failed
+
+:debian12
+echo Chargement de Debian 12...
+kernel http://ftp.debian.org/debian/dists/bookworm/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
+initrd http://ftp.debian.org/debian/dists/bookworm/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
+boot || goto failed
+
+:rescue
+echo Chargement du mode rescue...
+kernel http://pxe.campus.local/images/rescue/vmlinuz
+initrd http://pxe.campus.local/images/rescue/initrd.img
+boot || goto failed
+
+:local
+echo Démarrage depuis le disque local...
+exit
+
+:reboot
+reboot
+
+:failed
+echo Échec du démarrage. Appuyez sur une touche pour retourner au menu...
+prompt
+goto start

@@ -1,2 +1,0 @@
-admin-net
-admin-infra
