@@ -1,395 +1,309 @@
-# 🏫 Campus Platform - Infrastructure Réseau Éducative
+# 🏫 Campus Platform - Installation Native (Sans Docker)
 
-Plateforme d'infrastructure réseau basée sur Docker pour campus, écoles et centres de formation.
+Installation complète de tous les services directement sur une VM Ubuntu/Debian.
 
-## 📋 Vue d'ensemble
+## 📋 Prérequis
 
-Ce projet fournit une infrastructure réseau complète avec :
+- **VM Ubuntu 20.04/22.04/24.04** ou **Debian 11/12**
+- **Minimum 2 Go RAM, 20 Go disque**
+- **Accès root (sudo)**
+- **Connexion Internet** (pour l'installation initiale)
 
-- **🗄️ MariaDB** - Base de données relationnelle pour stockage des métadonnées
-- **🔍 Bind9** - Serveur DNS pour résolution locale (campus.local)
-- **📡 Kea DHCP** - Attribution automatique d'adresses IP
-- **🖥️ iPXE** - Serveur de boot réseau pour installation d'OS
-- **🚀 Squid** - Proxy cache HTTP pour optimiser la navigation
-- **🌐 Nginx** - Reverse proxy comme point d'entrée unique
-- **📁 vsftpd** - Serveur FTP pour partage de fichiers lourds (ISO, docs, vidéos)
-
-## 🚀 Installation rapide
-
-### Prérequis
+## 🚀 Installation automatique
 
 ```bash
-# Vérifier que Docker est installé
-docker --version
+# 1. Télécharger le script
+cd /home/momo/TP_ServiceRX
 
-# Vérifier Docker Compose
-docker-compose --version
+# 2. Rendre exécutable
+chmod +x install-native.sh check-services.sh start-services.sh stop-services.sh
+
+# 3. Lancer l'installation (en tant que root)
+sudo ./install-native.sh
 ```
 
-Si Docker n'est pas installé :
+Le script installe et configure automatiquement :
+- ✅ **Bind9** - Serveur DNS
+- ✅ **ISC DHCP** - Serveur DHCP
+- ✅ **Nginx** - Serveur Web
+- ✅ **MariaDB** - Base de données
+- ✅ **Squid** - Proxy cache HTTP
+- ✅ **vsftpd** - Serveur FTP
+- ✅ **TFTP** - Boot PXE réseau
+
+## 🔧 Configuration post-installation
+
+### 1. Configurer l'adresse IP statique
 
 ```bash
-# Ubuntu/Debian
-sudo apt update
-sudo apt install docker.io docker-compose
-
-# Ajouter votre utilisateur au groupe docker
-sudo usermod -aG docker $USER
-newgrp docker
+# Éditer la configuration réseau
+sudo nano /etc/netplan/00-installer-config.yaml
 ```
 
-### Démarrage
-
-```bash
-# Rendre les scripts exécutables
-chmod +x start.sh stop.sh scripts/*.sh
-
-# Démarrer tous les services
-./start.sh
-```
-
-Le script va :
-1. Créer les dossiers de données nécessaires
-2. Configurer les permissions
-3. Démarrer tous les conteneurs Docker
-4. Afficher les informations de connexion
-
-## 🌐 Accès aux services
-
-### Configuration DNS locale
-
-Ajoutez ces lignes dans votre fichier `/etc/hosts` (Linux/Mac) ou `C:\Windows\System32\drivers\etc\hosts` (Windows) :
-
-```
-10.20.0.30  campus.local
-10.20.0.30  pxe.campus.local
-10.20.0.20  ftp.campus.local
-```
-
-### URLs des services
-
-| Service | URL | Description |
-|---------|-----|-------------|
-| **Portal** | http://campus.local | Page d'accueil principale |
-| **PXE Boot** | http://pxe.campus.local | Interface de boot réseau |
-| **FTP** | ftp://ftp.campus.local | Serveur de fichiers |
-| **Proxy Squid** | http://10.20.0.30:3128 | Cache HTTP |
-
-### 🔑 Identifiants par défaut
-
-**FTP :**
-- Utilisateur : `campus`
-- Mot de passe : `campus123`
-
-**Base de données (MariaDB) :**
-- Root password : `campus_root_2026`
-- User : `campus_user`
-- Password : `campus_pass`
-
-> ⚠️ **Sécurité** : Changez ces mots de passe en production !
-
-## 🏗️ Architecture
-
-### Réseaux Docker
-
-```
-campus-network (172.20.0.0/16)
-├── Nginx (172.20.0.30) - Reverse Proxy
-├── Bind9 (172.20.0.10) - DNS
-├── FTP (172.20.0.20) - Serveur de fichiers
-├── Squid - Proxy cache
-├── Nextcloud - Cloud storage
-├── Moodle - LMS
-└── DokuWiki - Wiki
-
-campus-backend (réseau interne)
-└── iPXE (172.20.0.15) - Boot Server
-├── Bind9 (172.20.0.10) - DNS Server
-├── FTP (172.20.0.20) - File Server
-└── Squid - HTTP Proxy Cache
-
-campus-backend (réseau interne)
-└── MariaDB - Base de données
-
-Host Network
-└── Kea DHCP - DHCP Server (nécessite accès réseau physique)
-```
-
-### Services et ports
-
-| Service | Port(s) | Réseau | IP |
-|---------|---------|--------|-----|
-| Nginx | 80, 443 | Public | 10.20.0.30 |
-| Bind9 | 53/tcp, 53/udp | Public | 10.20.0.10 |
-| iPXE | 69/udp (TFTP), 8080 (HTTP) | Public | 10.20.0.15 |
-| Kea DHCP | 67/udp | Host | - |
-| Squid | 3128 | Public | Dynamic |
-| FTP | 20, 21, 21100-21110 | Public | 10.20.0.20 |
-| MariaDB | 3306 | Backend | Dynamic
-
-# Arrêter les services
-./stop.sh
-
-# Voir l'état et les statistiques
-./scripts/monitor.sh
-
-# Sauvegarder les données
-./scripts/backup.sh
-
-# Voir les logs d'un service
-docker-compose logs -f nextcloud
-
-# Redémarrer un service spécifique
-docker-compose restart nginx
-
-# Accéder au shell d'un conteneur
-docker-compose exec nextginx
-
-# Redémarrer un service spécifique
-docker-compose restart nginx
-
-# Accéder au shell d'un conteneur
-docker-compose exec mariadb
-- Utilisation du disque
-- Connectivité réseau
-- Utilisation CPU/RAM
-
-### Sauvegardes
-
-LeFichiers FTP
-- Configurations (Bind9, Kea, Nginx, Squid, iPXE)i
-- Fichiers FTP
-- Configurations
-
-Les sauvegardes sont stockées dans `./backups/YYYYMMDD_HHMMSS/`
-
-## 🔧 Configuration avancée
-
-### Personnaliser le réseau
-
-Modifiez dans [docker-compose.yml](docker-compose.yml) :
-
+Exemple de configuration :
 ```yaml
-networks:
-  campus-network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16  # Changez le sous-réseau ici
+network:
+  version: 2
+  ethernets:
+    eth0:  # ou ens33, enp0s3, etc.
+      addresses:
+        - 10.20.0.1/16
+      nameservers:
+        addresses: [127.0.0.1, 8.8.8.8]
+      routes:
+        - to: default
+          via: 10.20.0.254  # Votre passerelle
 ```
 
-### Ajouter un service
-
-1. Ajoutez le service dans `docker-compose.yml`
-2. Créez la configuration dans `configs/[service]/`
-3. Ajoutez la route dans `configs/nginx/conf.d/campus.conf`
-4. Ajoutez l'entrée DNS dans `configs/bind9/zones/db.campus.local`
-
-### Configuration du proxy Squid
-
-Pour utiliser le cache web sur les postes clients :
-
-**Linux :**
+Appliquer :
 ```bash
-export http_proxy=http://172.20.0.30:3128
-export https_proxy=http://172.20.0.30:3128
+sudo netplan apply
 ```
 
-**Windows :**
-Paramètres → Réseau → Proxy → Configuration manuelle
-- Adresse : 172.20.0.30
-- Port : 3128
+### 2. Démarrer le serveur DHCP
 
-### Boot PXE (à venir)
-
-
-Le service iPXE est déjà configuré avec un menu de démarrage pour :
-- Ubuntu 22.04 Desktop
-- Ubuntu 22.04 Server
-- Debian 12
-- Mode Rescue
-
-**Configuration BIOS :**
-1. Activez le boot réseau (PXE) (zones, named.conf)
-│   ├── kea/                 # DHCP (kea-dhcp4.conf)
-│   ├── nginx/               # Reverse proxy (nginx.conf, conf.d/)
-│   ├── squid/               # Cache proxy (squid.conf)
-│   ├── ipxe/                # Boot réseau (boot.ipxe, index.html)
-│   └── mariadb/             # Base de données (init.sql)
-├── data/                    # Données persistantes (généré au démarrage)
-│   ├── mariadb/            # Données MariaDB
-│   ├── bind9/              # Cache DNS
-│   ├── kea/                # Leases DHCP
-│   ├── squid/              # Cache HTTP
-│   ├── ipxe/               # Images ISO et boot files
-│   └── ftp/                # Fichiers FTP
-├── scripts/                 # Scripts utilitaires
-│   ├── monitor.sh          # Monitoring des services
-│   ├── backup.sh           # Sauvegardes automatiques
-│   └── generate-ssl.sh     # Génération certificats SSL
-├── web/                    # Site du portail
-│   └── index.html          # Page d'accueil
-├── docker-compose.yml      # Orchestration des conteneurs
-├── start.sh               # Script de démarrage
-├── stop.sh                # Script d'arrêt
-├── .env.example           # Variables d'environnemennnées persistantes (généré au démarrage)
-│   ├── mariadb/
-│   ├── nextcloud/
-│   ├── moodle/
-│   ├── dokuwiki/
-│   └── ftp/
-├── scripts/                 # Scripts utilitaires
-│   ├── monitor.sh          # Monitoring
-│   └── backup.sh           # Sauvegardes
-├── web/                    # Site du portail
-│   └── index.html
-├── docker-compose.yml      # Orchestration
-├── start.sh               # Démarrage
-├── stop.sh                # Arrêt
-└── README.md              # Documentation
+```bash
+sudo systemctl start isc-dhcp-server
+sudo systemctl status isc-dhcp-server
 ```
+
+### 3. Vérifier tous les services
+
+```bash
+./check-services.sh
+```
+
+## 📊 Gestion des services
+
+### Démarrer tous les services
+```bash
+./start-services.sh
+```
+
+### Arrêter tous les services
+```bash
+./stop-services.sh
+```
+
+### Vérifier l'état
+```bash
+./check-services.sh
+```
+
+### Gérer un service individuellement
+```bash
+# Démarrer
+sudo systemctl start bind9
+
+# Arrêter
+sudo systemctl stop bind9
+
+# Redémarrer
+sudo systemctl restart bind9
+
+# Voir les logs
+sudo journalctl -u bind9 -f
+```
+
+## 🌐 Services et ports
+
+| Service | Port | Accès | Identifiants |
+|---------|------|-------|--------------|
+| **Web (Nginx)** | 80 | http://10.20.0.1 | - |
+| **DNS (Bind9)** | 53 | 10.20.0.10 | - |
+| **DHCP** | 67 | Automatique | - |
+| **Proxy (Squid)** | 3128 | 10.20.0.1:3128 | - |
+| **FTP (vsftpd)** | 21, 21100-21110 | ftp://10.20.0.1 | campus/campus123 |
+| **MariaDB** | 3306 | localhost | campus_user/campus_pass |
+| **TFTP/PXE** | 69 | Réseau | - |
 
 ## 🔍 Dépannage
 
-### Les services ne démarrent pas
+### DNS ne résout pas
 
 ```bash
-# Vérifier les logs
-docker-compose logs
-
-# Vérifier l'état
-docker-compose ps
-
-# Redémarrer complètement
-docker-compose down
-docker-compose up -d
-```
-
-### Problème de permissions
-
-```bash
-# Réinitialiser les permissions
-sudo chown -R $USER:$USER data/
-```
-
-### Erreur de connexion à la base de données
-
-```bash
-# Vérifier que MariaDB est démarré
-docker-compose ps mariadb
-
-# Voir les logs
-docker-compose logs mariadb
-
-# Redémarrer MariaDB
-docker-compose restart mariadb
-```
-
-### Impossible d'accéder aux services web
-
-1. Vérifiez que `/etc/hosts` est correctement configuré
-2. Vérifiez que Nginx est démarré : `docker-compose ps nginx`
-3. Testez directement avec l'IP : `http://172.20.0.30`
-
-## 🛡️ Sécurité
-
-### Bonnes pratiques
-
-1. 🎓 Cas d'usage pédagogiques
-
-### 1. Installation d'OS en masse via PXE
-Installez Ubuntu sur 30 postes simultanément sans clés USB :
-- Démarrez les PC en mode PXE
-- Sélectionnez "Ubuntu 22.04 Desktop"
-- Installation automatique via réseau
-
-### 2. Partage de ressources volumineuses
-Le professeur partage 10 Go de vidéos de cours :
-- Upload via FTP : `ftp://ftp.campus.local/cours/`
-- Les étudiants téléchargent via le cache Squid
-- Gain de bande passante : téléchargement unique, puis cache
-
-### 3. Lab réseau isolé
-Configuration d'un réseau complet pour TPs :
-- DN� Dépannage avancé
-
-### Le boot PXE ne fonctionne pas
-
-```bash
-# Vérifier que le serveur TFTP écoute
-docker-compose logs ipxe
-
-# Vérifier que le DHCP pointe vers le bon serveur
-docker-compose exec kea-dhcp cat /etc/kea/kea-dhcp4.conf | grep next-server
-```
-
-### Le proxy Squid ne cache pas
-
-```bash
-# Vérifier l'espace disque du cache
-docker-compose exec squid df -h /var/spool/squid
-
-# Réinitialiser le cache
-docker-compose exec squid squid -z
-docker-compose restart squid
-```
-
-### DNS ne résout pas les noms
-
-```bash
-# Tester la résolution
-docker-compose exec bind9 nslookup campus.local localhost
+# Vérifier la configuration
+sudo named-checkconf
 
 # Vérifier les zones
-docker-compose exec bind9 named-checkzone campus.local /etc/bind/zones/db.campus.local
+sudo named-checkzone campus.local /etc/bind/zones/db.campus.local
+
+# Redémarrer
+sudo systemctl restart bind9
+
+# Logs
+sudo journalctl -u bind9 -n 50
 ```
 
-## 📝 Licence
+### DHCP ne démarre pas
 
-Ce projet est open-source et peut être utilisé librement à des fins éducatives.
+```bash
+# Vérifier la config
+sudo dhcpd -t -cf /etc/dhcp/dhcpd.conf
+
+# Vérifier l'interface
+ip addr show
+
+# Logs
+sudo journalctl -u isc-dhcp-server -n 50
+```
+
+### Nginx erreur
+
+```bash
+# Tester la config
+sudo nginx -t
+
+# Redémarrer
+sudo systemctl restart nginx
+
+# Logs
+sudo tail -f /var/log/nginx/error.log
+```
+
+### Squid ne démarre pas
+
+```bash
+# Initialiser le cache
+sudo squid -z
+
+# Vérifier la config
+sudo squid -k parse
+
+# Redémarrer
+sudo systemctl restart squid
+```
+
+## 📁 Emplacements des fichiers
+
+### Configurations
+- **Bind9** : `/etc/bind/`
+- **DHCP** : `/etc/dhcp/dhcpd.conf`
+- **Nginx** : `/etc/nginx/sites-available/campus`
+- **Squid** : `/etc/squid/squid.conf`
+- **vsftpd** : `/etc/vsftpd.conf`
+- **TFTP** : `/var/lib/tftpboot/`
+
+### Données
+- **Site web** : `/var/www/campus/`
+- **FTP** : `/home/campus/ftp/`
+- **Logs** : `/var/log/`
+
+## 🔐 Sécurité
+
+### Changer les mots de passe
+
+```bash
+# FTP
+sudo passwd campus
+
+# MariaDB
+sudo mysql -e "ALTER USER 'campus_user'@'localhost' IDENTIFIED BY 'NOUVEAU_MOT_DE_PASSE';"
+```
+
+### Firewall (optionnel)
+
+```bash
+# Installer UFW
+sudo apt install ufw
+
+# Autoriser les services
+sudo ufw allow 53/tcp
+sudo ufw allow 53/udp
+sudo ufw allow 67/udp
+sudo ufw allow 80/tcp
+sudo ufw allow 21/tcp
+sudo ufw allow 3128/tcp
+sudo ufw allow 69/udp
+sudo ufw allow 21100:21110/tcp
+
+# Activer
+sudo ufw enable
+```
+
+## 📝 Personnalisation
+
+### Changer le domaine
+
+Éditer `/etc/bind/zones/db.campus.local` et modifier les références à `campus.local`.
+
+### Modifier la plage DHCP
+
+Éditer `/etc/dhcp/dhcpd.conf` :
+```bash
+sudo nano /etc/dhcp/dhcpd.conf
+# Modifier: range 10.20.100.0 10.20.200.254;
+sudo systemctl restart isc-dhcp-server
+```
+
+### Personnaliser la page web
+
+```bash
+sudo nano /var/www/campus/index.html
+sudo systemctl reload nginx
+```
+
+## 🎓 Utilisation pédagogique
+
+### Scénario 1 : Lab réseau complet
+Les étudiants se connectent au réseau campus et obtiennent automatiquement :
+- Une adresse IP (DHCP)
+- Configuration DNS
+- Accès au proxy pour navigation optimisée
+
+### Scénario 2 : Installation OS via PXE
+1. Placer les images ISO dans `/var/lib/tftpboot/`
+2. Configurer le menu PXE
+3. Démarrer les postes en mode réseau
+
+### Scénario 3 : Exercices SQL
+Connexion à MariaDB :
+```bash
+mysql -u campus_user -pcampus_pass campus_users
+```
+
+## 📚 Commandes utiles
+
+```bash
+# Voir tous les services
+systemctl list-units --type=service --state=running | grep -E "bind9|dhcp|nginx|maria|squid|ftp|tftp"
+
+# Ports ouverts
+sudo netstat -tuln
+
+# Processus
+ps aux | grep -E "named|dhcpd|nginx|mysql|squid|vsftpd"
+
+# Espace disque
+df -h
+
+# Mémoire
+free -h
+
+# Backup configuration
+sudo tar -czf campus-backup-$(date +%Y%m%d).tar.gz /etc/bind /etc/dhcp /etc/nginx /var/www/campus
+```
+
+## ✅ Checklist de déploiement
+
+- [ ] Installation terminée sans erreur
+- [ ] IP statique configurée
+- [ ] DNS résout campus.local
+- [ ] DHCP attribue des adresses
+- [ ] Site web accessible
+- [ ] Proxy Squid fonctionne
+- [ ] FTP accessible
+- [ ] MariaDB répond
+- [ ] Firewall configuré (si nécessaire)
+- [ ] Sauvegardes en place
+
+## 🆘 Support
+
+En cas de problème :
+1. Vérifier les logs : `sudo journalctl -xe`
+2. Exécuter : `./check-services.sh`
+3. Consulter `/var/log/syslog`
 
 ---
 
-**🏫 Développé pour les campus sociaux, écoles et centres de formation**
-
-**Services inclus :** Kea DHCP • Bind9 DNS • iPXE Boot • Squid Proxy • Nginx • MariaDB • vsftpd
-
-Pour toute question : adminions dans iPXE
-- Intégrer des applications web (Moodle, Nextcloud)
-- Monitoring avancé (Prometheus/Grafana)
-- Automatisation des déploiements
-- Interface web pour gestion DHCP/DNS
-
-## 📚 Ressources
-
-- [Documentation Docker](https://docs.docker.com/)
-- [Nginx Documentation](https://nginx.org/en/docs/)
-- [Bind9 Documentation](https://bind9.readthedocs.io/)
-- [Kea DHCP Documentation](https://kea.readthedocs.io/)
-- [Squid Documentation](http://www.squid-cache.org/Doc/)
-- [iPXE Documentation](https://ipxe.org/docs
-## 🤝 Contribution
-
-N'hésitez pas à améliorer ce projet :
-- Ajoutez de nouveaux services
-- Optimisez les configurations
-- Corrigez les bugs
-- Améliorez la documentation
-
-## 📚 Ressources
-
-- [Documentation Docker](https://docs.docker.com/)
-- [Nextcloud Documentation](https://docs.nextcloud.com/)
-- [Moodle Documentation](https://docs.moodle.org/)
-- [Nginx Documentation](https://nginx.org/en/docs/)
-- [Bind9 Documentation](https://bind9.readthedocs.io/)
-
-## 📝 Licence
-
-Ce projet est open-source et peut être utilisé librement à des fins éducatives.
-
----
-
-**Développé pour les campus sociaux, écoles et centres de formation** 🎓
-
-Pour toute question : campus@campus.local
+**Installation native Campus Platform** - Tous services sans Docker 🚀
