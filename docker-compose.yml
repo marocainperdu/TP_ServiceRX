@@ -35,14 +35,26 @@ services:
       - "5353:53/tcp"
       - "5353:53/udp"
     volumes:
-      - ./configs/bind9/named.conf:/etc/bind/named.conf
-      - ./configs/bind9/zones:/etc/bind/zones
+      - ./configs/bind9/named.conf:/etc/bind/named.conf:ro
+      - ./configs/bind9/zones:/etc/bind/zones:ro
       - ./data/bind9:/var/cache/bind
+      - /tmp/bind9-cache:/var/cache/bind/dynamic
     networks:
       campus-network:
         ipv4_address: 10.20.0.10
     environment:
       - TZ=Europe/Paris
+    user: "root"
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    healthcheck:
+      test: ["CMD", "ps", "aux"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
 
   # ========================================
   # DHCP Server (ISC DHCP)
@@ -53,13 +65,18 @@ services:
     restart: unless-stopped
     network_mode: host
     volumes:
-      - ./configs/dhcp/dhcpd.conf:/etc/dhcp/dhcpd.conf
+      - ./configs/dhcp:/data
       - ./data/dhcp:/var/lib/dhcp
     cap_add:
       - NET_ADMIN
       - NET_RAW
     environment:
       - INTERFACES=eth0
+    healthcheck:
+      test: ["CMD", "ps", "aux"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   # ========================================
   # Proxy Cache (Squid)

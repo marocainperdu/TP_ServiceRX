@@ -1,6 +1,6 @@
 $TTL    604800
 @       IN      SOA     ns1.campus.local. admin.campus.local. (
-                              2026011401         ; Serial
+                              2026011501         ; Serial
                               604800         ; Refresh
                               86400         ; Retry
                               2419200         ; Expire
@@ -8,7 +8,9 @@ $TTL    604800
 ;
 @       IN      NS      ns1.campus.local.
 
-; Reverse DNS
+; Reverse DNS pour le réseau 10.20.0.0/16
+; Format: dernier octet du dernier octet de la plage
 10.0    IN      PTR     ns1.campus.local.
 20.0    IN      PTR     ftp.campus.local.
-30.0    IN      PTR     campus.local.
+30.0    IN      PTR     nginx.campus.local.
+15.0    IN      PTR     ipxe.campus.local.
